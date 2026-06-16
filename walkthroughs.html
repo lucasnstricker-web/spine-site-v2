@@ -3,21 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spine — Feature walkthroughs (white / screen-recording style)</title>
+<title>Spine — Feature walkthroughs (compact tabbed)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@1,8..60,400;1,8..60,500&display=swap');
 
 /* ============================================================
-   SPINE FEATURE WALKTHROUGHS — WHITE / "SCREEN-RECORDING" STYLE
-   Six looping product mockups, each framed in a macOS-style
-   browser window (.win-bar: red/amber/green dots + centered URL
-   pill) with a LIGHT body that reads like a real recording of
-   the (light-themed) Spine app. Reuses the exact light mockup
-   tokens + atoms from assets/site.css. Each block is wrapped in
-   <!-- ===== NAME ===== --> comments and is independently
-   copy-pasteable into any page that loads these tokens.
+   SPINE FEATURE WALKTHROUGHS — COMPACT TABBED COMPONENT
+   Six looping product mockups (Decision · Calibration · Impact ·
+   Integrations · Future-Proofing · Org Intelligence), each framed
+   in a macOS-style browser window (.win-bar + LIGHT --m-* tokens),
+   now collapsed into ONE compact interactive panel: a horizontal
+   tab bar swaps which walkthrough is visible inside a single
+   fixed-height (clipped) viewport. The mockup markup + light
+   token system are reused VERBATIM from the stacked version.
+   Classes prefixed .swt-* (Spine WalkThrough) so the whole thing
+   is embeddable. Total component height ≈ 660px.
    ============================================================ */
 
 /* ---- LIGHT MOCKUP TOKENS (verbatim from assets/site.css) ---- */
@@ -37,19 +39,41 @@
 body{
   font-family:"Geist",Inter,system-ui,-apple-system,sans-serif;
   background:#0a0a0c;color:#fafafa;-webkit-font-smoothing:antialiased;
-  text-rendering:optimizeLegibility;line-height:1.55;padding:56px 28px 100px;
+  text-rendering:optimizeLegibility;line-height:1.55;
+  display:flex;align-items:center;justify-content:center;min-height:100vh;padding:28px 24px;
 }
-.page-head{max-width:980px;margin:0 auto 48px}
-.page-head .kick{display:inline-flex;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
-  color:#a6a7b0;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:6px 14px;margin-bottom:18px}
-.page-head h1{font-size:34px;font-weight:600;letter-spacing:-.035em;line-height:1.1;margin-bottom:12px}
-.page-head h1 .si{font-family:var(--serif);font-style:italic;font-weight:400}
-.page-head p{font-size:15.5px;color:#a6a7b0;max-width:620px}
-.wt-stack{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:56px}
-.wt-block .lab{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#6d6e78;
-  display:flex;align-items:center;gap:9px;margin-bottom:14px}
-.wt-block .lab i{display:inline-block;width:18px;height:2px;border-radius:2px;background:var(--irid)}
-.wt-block .lab em{font-style:normal;color:#a6a7b0;font-weight:400;letter-spacing:0;text-transform:none;font-size:13px}
+
+/* ============================================================
+   COMPONENT SHELL — intro + tabs + fixed panel viewport
+   ============================================================ */
+.swt{width:100%;max-width:1040px;margin:0 auto}
+
+/* compact section intro (≤ ~90px tall) */
+.swt-intro{margin:0 auto 16px;max-width:1040px}
+.swt-intro .kick{display:inline-flex;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:#a6a7b0;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:5px 13px;margin-bottom:11px}
+.swt-intro h1{font-size:26px;font-weight:600;letter-spacing:-.035em;line-height:1.12}
+.swt-intro h1 .si{font-family:var(--serif);font-style:italic;font-weight:400}
+
+/* horizontal tab bar (on the dark page) */
+.swt-tabs{display:flex;flex-wrap:wrap;gap:4px 22px;align-items:flex-end;
+  border-bottom:1px solid rgba(255,255,255,.10);margin-bottom:18px;padding-bottom:0}
+.swt-tab{position:relative;background:none;border:0;cursor:pointer;font-family:inherit;
+  font-size:12.5px;font-weight:500;letter-spacing:-.005em;color:#a6a7b0;padding:9px 1px 11px;
+  transition:color .18s ease}
+.swt-tab:hover{color:#d7d8df}
+.swt-tab.is-active{color:#fafafa}
+.swt-tab::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;border-radius:2px;
+  background:var(--irid);opacity:0;transform:scaleX(.4);transform-origin:left;transition:opacity .2s ease,transform .2s ease}
+.swt-tab.is-active::after{opacity:1;transform:scaleX(1)}
+
+/* fixed-height clipped viewport — every walkthrough occupies the same footprint */
+.swt-viewport{position:relative;height:540px;overflow:hidden;border-radius:14px}
+.swt-block{position:absolute;inset:0;display:none}
+.swt-block.is-active{display:block}
+
+/* scale the inner window down slightly so taller mockups fit the fixed footprint */
+.swt-fit{transform-origin:top center;width:100%}
 
 /* ============================================================
    BROWSER WINDOW + CHROME  (macOS .win-bar — light body)
@@ -365,6 +389,11 @@ body{
 .org-foot{margin-top:11px;font-size:10.5px;color:var(--m-ink3)}
 .org-foot b{color:var(--m-ink2);font-weight:600}
 
+/* ---------- only the visible panel animates ----------
+   Animations live on .swt-block descendants but are paused while
+   the block is display:none (browsers already pause animations on
+   display:none subtrees); this keeps loops to the active panel. */
+
 /* ---------- reduced motion: collapse to revealed end-state ---------- */
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
@@ -387,8 +416,12 @@ body{
   .read-overlay{opacity:1!important;transform:none!important}
 }
 
-@media (max-width:620px){
-  body{padding:36px 16px 70px}
+@media (max-width:680px){
+  body{padding:20px 14px}
+  .swt-intro h1{font-size:22px}
+  .swt-tabs{gap:2px 14px}
+  .swt-tab{font-size:11.5px}
+  .swt-viewport{height:560px}
   .dec-cells{grid-template-columns:1fr}
   .dec-cell:first-child{border-right:none;border-bottom:1px solid var(--m-line)}
   .connect-grid{grid-template-columns:1fr}
@@ -397,365 +430,438 @@ body{
 </head>
 <body>
 
-<div class="page-head">
-  <span class="kick">Product walkthroughs</span>
-  <h1>What a Spine session <span class="si">actually</span> looks like.</h1>
-  <p>See what Spine does at each stage of a hire — the decision, the calibration, the impact, the integrations, future-proofing, and org intelligence.</p>
-</div>
+<div class="swt" id="swt">
 
-<div class="wt-stack">
-
-  <!-- ===== DECISION ===== -->
-  <div class="wt-block">
-    <div class="lab"><i></i>Decision <em>— sealed dual-read → recommendation → ranked finalists</em></div>
-    <div class="window">
-      <div class="win-bar">
-        <div class="dots"><i></i><i></i><i></i></div>
-        <div class="url">app.withspine.co/decision/R1</div>
-      </div>
-      <div class="ptabs">
-        <span class="on">Decision</span><span>Pipeline</span><span>Calibration</span><span>Impact</span>
-        <span>Integrations</span><span>Future Proofing</span><span>Org Intelligence</span>
-      </div>
-      <div class="pbody" style="padding:0">
-        <div class="bh" style="padding:16px 16px 12px;margin:0">
-          <div class="eyebrow">The call · R1</div>
-          <h2>Who to hire</h2>
-          <p>The one person we'd hire is named up top — with the case for them, and what you trade away by picking anyone else.</p>
-        </div>
-        <div class="mcard" style="margin:0 16px 14px;border-radius:10px;overflow:hidden">
-          <div class="dec-top">
-            <span class="avatar">PA</span>
-            <div class="ttl"><b>Priya Anand</b><span>Senior Quant Developer · Final round</span></div>
-            <span class="appchip high">88–93% APP</span>
-          </div>
-          <div class="dec-cells">
-            <div class="dec-cell">
-              <span class="mcap">Founder gut · blind</span>
-              <p><b>Lean hire.</b> Sharp in the loop, strong references — but I haven't pressure-tested the systems-design depth.</p>
-              <span class="sealchip"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Sealed at 14:32</span>
-            </div>
-            <div class="dec-cell">
-              <span class="mcap">Spine read</span>
-              <div class="h-blurnote">Your read seals first so Spine's can't colour it.</div>
-              <div class="h-read">
-                <p><b>Recommend.</b> Reads as a clear hire — top of the framework on the two dimensions this role weights most.</p>
-                <div class="spineread" style="margin-top:9px"><i>RISK</i><span>Systems-design depth is the one thing to pressure-test in the final.</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="dec-rec h-rec">
-            <span class="pick"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> Spine pick</span>
-            <div>
-              <b>Priya Anand — the one person we'd hire for R1.</b>
-              <p>One thing to keep an eye on: <em>systems-design depth</em>. Sealed reads agree; the gap to #2 is wide.</p>
-            </div>
-          </div>
-          <div class="fin-list">
-            <div class="finrow h-f1"><span class="rk">1</span><span class="avatar" style="width:26px;height:26px;font-size:9px">PA</span><div class="who"><b>Priya Anand</b><span>88–93% APP · Recommend</span></div><span class="spill green">Spine pick</span></div>
-            <div class="finrow h-f2"><span class="rk">2</span><span class="avatar" style="width:26px;height:26px;font-size:9px">MR</span><div class="who"><b>Marcus Reed</b><span>71–78% APP · Hold</span></div><span class="spill gray">Hold</span></div>
-            <div class="finrow h-f3"><span class="rk">3</span><span class="avatar" style="width:26px;height:26px;font-size:9px">JK</span><div class="who"><b>Jin Koh</b><span>58–64% APP · Pass</span></div><span class="spill gray">Pass</span></div>
-          </div>
-          <div class="dec-foot"><b>Finalists · ranked best-first.</b> Your read seals first so Spine's can't colour it. Open any finalist for the full report.</div>
-        </div>
-      </div>
-    </div>
+  <!-- compact intro -->
+  <div class="swt-intro">
+    <span class="kick">Product walkthroughs</span>
+    <h1>What a Spine session <span class="si">actually</span> looks like.</h1>
   </div>
 
-  <!-- ===== CALIBRATION ===== -->
-  <div class="wt-block">
-    <div class="lab"><i></i>Calibration <em>— predicted at hire vs Day 30 / 60 / 90 / 180 actual</em></div>
-    <div class="window">
-      <div class="win-bar">
-        <div class="dots"><i></i><i></i><i></i></div>
-        <div class="url">app.withspine.co/calibration</div>
-      </div>
-      <div class="ptabs">
-        <span>Decision</span><span>Pipeline</span><span class="on">Calibration</span><span>Impact</span>
-        <span>Integrations</span><span>Future Proofing</span><span>Org Intelligence</span>
-      </div>
-      <div class="pbody">
-        <div class="bh">
-          <div class="eyebrow">Does the hire hold up?</div>
-          <h2>Priya Anand · Senior Quant Developer</h2>
-          <p>Measured against exactly what Spine predicted at the decision, then re-checked at 30, 60, 90 and 180 days.</p>
-        </div>
-        <div class="mcard" style="border-radius:10px;overflow:hidden">
-          <div class="chartpad">
-            <div class="chead">
-              <b>How the hire is doing vs what Spine predicted</b>
-              <div class="legend">
-                <span><i class="you"></i> At hire (the bar)</span>
-                <span><i class="spn"></i> Now</span>
-              </div>
-            </div>
-            <svg class="cal-svg" viewBox="0 0 560 200" preserveAspectRatio="none" aria-hidden="true">
-              <line class="grid" x1="40" y1="30" x2="540" y2="30"/>
-              <line class="grid" x1="40" y1="75" x2="540" y2="75"/>
-              <line class="grid" x1="40" y1="120" x2="540" y2="120"/>
-              <line class="grid" x1="40" y1="165" x2="540" y2="165"/>
-              <text class="lbl" x="46" y="190">Hire</text>
-              <text class="lbl" x="158" y="190">Day 30</text>
-              <text class="lbl" x="270" y="190">Day 60</text>
-              <text class="lbl" x="382" y="190">Day 90</text>
-              <text class="lbl" x="486" y="190">Day 180</text>
-              <!-- predicted bar (flat-ish) -->
-              <polyline class="line-you" points="60,92 170,90 280,88 390,86 500,84"/>
-              <!-- actual now (tracking above the bar) -->
-              <polyline class="line-spn" points="60,92 170,80 280,66 390,58 500,46"/>
-              <circle class="dot p1" cx="60"  cy="92" r="4.5" fill="#2f6bff"/>
-              <circle class="dot p2" cx="170" cy="80" r="4.5" fill="#2f6bff"/>
-              <circle class="dot p3" cx="280" cy="66" r="4.5" fill="#2f6bff"/>
-              <circle class="dot p4" cx="390" cy="58" r="4.5" fill="#2f6bff"/>
-              <circle class="dot p5 gap-pulse" cx="500" cy="46" r="5.5" fill="#2f6bff"/>
-            </svg>
-            <div class="verdict-row">
-              <span class="vstamp">On track</span>
-              <p><b>Tracking better than predicted.</b> 3 points ahead of the bar we set the day she was hired. Latest read · Day 180.</p>
-            </div>
-            <div class="chart-foot"><b>Day 30 / 60 / 90 / 180 check-ins,</b> scheduled automatically from her start date — each re-checked against the decision basis.</div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <!-- tab bar -->
+  <div class="swt-tabs" role="tablist" aria-label="Product walkthroughs">
+    <button class="swt-tab is-active" role="tab" aria-selected="true"  data-target="b-decision">Decision</button>
+    <button class="swt-tab"           role="tab" aria-selected="false" data-target="b-calibration">Calibration</button>
+    <button class="swt-tab"           role="tab" aria-selected="false" data-target="b-impact">Impact</button>
+    <button class="swt-tab"           role="tab" aria-selected="false" data-target="b-integrations">Integrations</button>
+    <button class="swt-tab"           role="tab" aria-selected="false" data-target="b-future">Future-Proofing</button>
+    <button class="swt-tab"           role="tab" aria-selected="false" data-target="b-org">Org Intelligence</button>
   </div>
 
-  <!-- ===== IMPACT ===== -->
-  <div class="wt-block">
-    <div class="lab"><i></i>Impact <em>— the Spine Gap and value captured</em></div>
-    <div class="window">
-      <div class="win-bar">
-        <div class="dots"><i></i><i></i><i></i></div>
-        <div class="url">app.withspine.co/impact</div>
-      </div>
-      <div class="ptabs">
-        <span>Decision</span><span>Pipeline</span><span>Calibration</span><span class="on">Impact</span>
-        <span>Integrations</span><span>Future Proofing</span><span>Org Intelligence</span>
-      </div>
-      <div class="pbody" style="padding:0">
-        <div class="bh" style="padding:16px 16px 10px;margin:0">
-          <div class="eyebrow">What Spine earned you</div>
-          <h2>The Spine Gap</h2>
-          <p>The calls Spine got right that your gut would have missed — measured against your own sealed reads.</p>
-        </div>
-        <div class="mcard" style="margin:0 16px 14px;border-radius:10px">
-          <div class="gaphero">
-            <span class="gap-tag">The Spine Gap · 9 decisions scored</span>
-            <div class="gap-head">Spine caught <b>2 calls</b> your gut would have missed — protecting <em>£186,000</em> in hiring cost.</div>
-            <div class="gap-bars">
-              <div class="gap-bcol">
-                <div class="gap-bar you gb1" style="height:42%"></div>
-                <div class="gap-blab"><b>3</b><span>Your gut · leaned hire</span></div>
-              </div>
-              <div class="gap-bcol">
-                <span class="gap-cnt">+2 caught</span>
-                <div class="gap-bar spn gb2" style="height:70%"></div>
-                <div class="gap-blab"><b>5</b><span>Spine · backed hire</span></div>
-              </div>
-              <div class="gap-bcol">
-                <div class="gap-bar win gb3" style="height:62%"></div>
-                <div class="gap-blab"><b>4</b><span>Worked out · hired &amp; holding</span></div>
-              </div>
-            </div>
-            <div class="gap-value">
-              <div class="vc">
-                <span class="mcap">Value captured</span>
-                <b>£186,000</b>
-                <p>Mis-hire cost and cost-per-hire avoided across the calls Spine got right.</p>
-              </div>
-            </div>
-            <div class="gap-receipts">
-              <span class="mcap rcap">Where the gap showed up</span>
-              <div class="recrow rr1"><span class="avatar" style="width:24px;height:24px;font-size:8.5px">DV</span><div class="rn"><b>Daniel Vance</b><span>Your read: lean pass · Spine: backed hire</span></div><span class="spill green" style="margin-right:8px">Spine right</span><span class="rv">£112k</span></div>
-              <div class="recrow rr2"><span class="avatar" style="width:24px;height:24px;font-size:8.5px">SO</span><div class="rn"><b>Sara Okafor</b><span>Your read: lean hire · Spine: hold</span></div><span class="spill green" style="margin-right:8px">Spine right</span><span class="rv">£74k</span></div>
-              <div class="recrow rr3"><span class="avatar" style="width:24px;height:24px;font-size:8.5px">TM</span><div class="rn"><b>Tom Mercer</b><span>Your read: lean hire · Spine: hire</span></div><span class="spill gray" style="margin-right:8px">Gut held</span><span class="rv" style="color:var(--m-ink3)">—</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- fixed-height clipped viewport: one panel visible at a time -->
+  <div class="swt-viewport">
 
-  <!-- ===== INTEGRATIONS ===== -->
-  <div class="wt-block">
-    <div class="lab"><i></i>Integrations <em>— connect Slack, Gmail and your ATS</em></div>
-    <div class="window">
-      <div class="win-bar">
-        <div class="dots"><i></i><i></i><i></i></div>
-        <div class="url">app.withspine.co/integrations</div>
-      </div>
-      <div class="ptabs">
-        <span>Decision</span><span>Pipeline</span><span>Calibration</span><span>Impact</span>
-        <span class="on">Integrations</span><span>Future Proofing</span><span>Org Intelligence</span>
-      </div>
-      <div class="pbody">
-        <div class="bh">
-          <div class="eyebrow">Integrations</div>
-          <h2>Connect the channels your candidates come from</h2>
-          <p>Everything you bring in lands in the same pipeline, pre-screened the same way.</p>
+    <!-- ===== DECISION ===== -->
+    <div class="swt-block is-active" id="b-decision">
+     <div class="swt-fit">
+      <div class="window">
+        <div class="win-bar">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <div class="url">app.withspine.co/decision/R1</div>
         </div>
-        <div class="intg" style="padding:0">
-          <div class="ghead" style="margin-bottom:9px">Pinned · live data sources</div>
-          <div class="connect-grid">
-            <div class="conn-card cs1">
-              <div class="ic">#</div>
-              <div class="ci"><b>Slack</b><span>Live team signals — verify ship cadence &amp; engagement in real time.</span></div>
-              <div class="st">
-                <span class="spill gray off">Not connected</span>
-                <span class="spill green on">Connected</span>
-              </div>
-            </div>
-            <div class="conn-card cs2">
-              <div class="ic">@</div>
-              <div class="ci"><b>Gmail</b><span>Scan the candidate inbox so replies &amp; scheduling surface automatically.</span></div>
-              <div class="st">
-                <span class="spill gray off">Not connected</span>
-                <span class="spill green on">Connected</span>
-              </div>
-            </div>
-            <div class="conn-card cs3">
-              <div class="ic">G</div>
-              <div class="ci"><b>Greenhouse</b><span>Connect Greenhouse (Harvest API) — pull candidates straight in.</span></div>
-              <div class="st">
-                <span class="spill amber off">Action needed</span>
-                <span class="spill green on">Connected</span>
-              </div>
-            </div>
-            <div class="conn-card steady">
-              <div class="ic">↗</div>
-              <div class="ci"><b>Apply link</b><span>Public application URL — candidates self-enter the pipeline.</span></div>
-              <div class="st"><span class="spill blue">Live</span></div>
-            </div>
+        <div class="ptabs">
+          <span class="on">Decision</span><span>Pipeline</span><span>Calibration</span><span>Impact</span>
+          <span>Integrations</span><span>Future Proofing</span><span>Org Intelligence</span>
+        </div>
+        <div class="pbody" style="padding:0">
+          <div class="bh" style="padding:14px 16px 10px;margin:0">
+            <div class="eyebrow">The call · R1</div>
+            <h2>Who to hire</h2>
+            <p>The one person we'd hire is named up top — with the case for them, and what you trade away by picking anyone else.</p>
           </div>
-          <div class="intg-sum">
-            <div class="srow"><b>3 / 4 connected</b><span>Next: Greenhouse</span></div>
-            <div class="intg-track"><i></i></div>
+          <div class="mcard" style="margin:0 16px 14px;border-radius:10px;overflow:hidden">
+            <div class="dec-top">
+              <span class="avatar">PA</span>
+              <div class="ttl"><b>Priya Anand</b><span>Senior Quant Developer · Final round</span></div>
+              <span class="appchip high">88–93% APP</span>
+            </div>
+            <div class="dec-cells">
+              <div class="dec-cell">
+                <span class="mcap">Founder gut · blind</span>
+                <p><b>Lean hire.</b> Sharp in the loop, strong references — but I haven't pressure-tested the systems-design depth.</p>
+                <span class="sealchip"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Sealed at 14:32</span>
+              </div>
+              <div class="dec-cell">
+                <span class="mcap">Spine read</span>
+                <div class="h-blurnote">Your read seals first so Spine's can't colour it.</div>
+                <div class="h-read">
+                  <p><b>Recommend.</b> Reads as a clear hire — top of the framework on the two dimensions this role weights most.</p>
+                  <div class="spineread" style="margin-top:9px"><i>RISK</i><span>Systems-design depth is the one thing to pressure-test in the final.</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="dec-rec h-rec">
+              <span class="pick"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> Spine pick</span>
+              <div>
+                <b>Priya Anand — the one person we'd hire for R1.</b>
+                <p>One thing to keep an eye on: <em>systems-design depth</em>. Sealed reads agree; the gap to #2 is wide.</p>
+              </div>
+            </div>
+            <div class="fin-list">
+              <div class="finrow h-f1"><span class="rk">1</span><span class="avatar" style="width:26px;height:26px;font-size:9px">PA</span><div class="who"><b>Priya Anand</b><span>88–93% APP · Recommend</span></div><span class="spill green">Spine pick</span></div>
+              <div class="finrow h-f2"><span class="rk">2</span><span class="avatar" style="width:26px;height:26px;font-size:9px">MR</span><div class="who"><b>Marcus Reed</b><span>71–78% APP · Hold</span></div><span class="spill gray">Hold</span></div>
+              <div class="finrow h-f3"><span class="rk">3</span><span class="avatar" style="width:26px;height:26px;font-size:9px">JK</span><div class="who"><b>Jin Koh</b><span>58–64% APP · Pass</span></div><span class="spill gray">Pass</span></div>
+            </div>
+            <div class="dec-foot"><b>Finalists · ranked best-first.</b> Your read seals first so Spine's can't colour it. Open any finalist for the full report.</div>
           </div>
-          <div class="intg-foot"><b>The key is verified live,</b> then encrypted and stored server-side. It never reaches the browser again.</div>
         </div>
       </div>
+     </div>
     </div>
-  </div>
 
-  <!-- ===== FUTURE-PROOFING ===== -->
-  <div class="wt-block">
-    <div class="lab"><i></i>Future-Proofing <em>— retention triage: placed / on track / watch / at risk</em></div>
-    <div class="window">
-      <div class="win-bar">
-        <div class="dots"><i></i><i></i><i></i></div>
-        <div class="url">app.withspine.co/future-proofing</div>
-      </div>
-      <div class="ptabs">
-        <span>Decision</span><span>Pipeline</span><span>Calibration</span><span>Impact</span>
-        <span>Integrations</span><span class="on">Future Proofing</span><span>Org Intelligence</span>
-      </div>
-      <div class="pbody">
-        <div class="bh">
-          <div class="eyebrow">Future Proofing</div>
-          <h2>The people you placed are still being watched</h2>
-          <p>Spine reads each hire's check-ins and flags the ones drifting toward the door — early enough to keep them.</p>
+    <!-- ===== CALIBRATION ===== -->
+    <div class="swt-block" id="b-calibration">
+     <div class="swt-fit">
+      <div class="window">
+        <div class="win-bar">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <div class="url">app.withspine.co/calibration</div>
         </div>
-        <div class="triage" style="padding:0">
-          <div class="tri-band">
-            <div class="tri-tally"><b>8</b><span>Placed</span></div>
-            <div class="tri-tally"><b class="gr">5</b><span>On track</span></div>
-            <div class="tri-tally"><b class="am">2</b><span>Watch</span></div>
-            <div class="tri-tally"><b class="rd">1</b><span>At risk</span></div>
+        <div class="ptabs">
+          <span>Decision</span><span>Pipeline</span><span class="on">Calibration</span><span>Impact</span>
+          <span>Integrations</span><span>Future Proofing</span><span>Org Intelligence</span>
+        </div>
+        <div class="pbody">
+          <div class="bh">
+            <div class="eyebrow">Does the hire hold up?</div>
+            <h2>Priya Anand · Senior Quant Developer</h2>
+            <p>Measured against exactly what Spine predicted at the decision, then re-checked at 30, 60, 90 and 180 days.</p>
           </div>
-          <div class="tri-grouphead amber"><span class="dt"></span>Keep an eye on <em>— doing the job, but one signal is starting to slip</em></div>
-          <div class="hire-card at-risk">
-            <div class="hire-top">
-              <span class="avatar" style="width:28px;height:28px;font-size:9.5px">RK</span>
-              <div class="who"><b>Rohan Khanna</b><span>Backend Engineer · placed 4 Feb · Day 90</span></div>
-              <div class="hire-flip">
-                <span class="spill amber hf-old">Watch</span>
-                <span class="spill red hf-new">At risk</span>
+          <div class="mcard" style="border-radius:10px;overflow:hidden">
+            <div class="chartpad">
+              <div class="chead">
+                <b>How the hire is doing vs what Spine predicted</b>
+                <div class="legend">
+                  <span><i class="you"></i> At hire (the bar)</span>
+                  <span><i class="spn"></i> Now</span>
+                </div>
+              </div>
+              <svg class="cal-svg" viewBox="0 0 560 200" preserveAspectRatio="none" aria-hidden="true">
+                <line class="grid" x1="40" y1="30" x2="540" y2="30"/>
+                <line class="grid" x1="40" y1="75" x2="540" y2="75"/>
+                <line class="grid" x1="40" y1="120" x2="540" y2="120"/>
+                <line class="grid" x1="40" y1="165" x2="540" y2="165"/>
+                <text class="lbl" x="46" y="190">Hire</text>
+                <text class="lbl" x="158" y="190">Day 30</text>
+                <text class="lbl" x="270" y="190">Day 60</text>
+                <text class="lbl" x="382" y="190">Day 90</text>
+                <text class="lbl" x="486" y="190">Day 180</text>
+                <!-- predicted bar (flat-ish) -->
+                <polyline class="line-you" points="60,92 170,90 280,88 390,86 500,84"/>
+                <!-- actual now (tracking above the bar) -->
+                <polyline class="line-spn" points="60,92 170,80 280,66 390,58 500,46"/>
+                <circle class="dot p1" cx="60"  cy="92" r="4.5" fill="#2f6bff"/>
+                <circle class="dot p2" cx="170" cy="80" r="4.5" fill="#2f6bff"/>
+                <circle class="dot p3" cx="280" cy="66" r="4.5" fill="#2f6bff"/>
+                <circle class="dot p4" cx="390" cy="58" r="4.5" fill="#2f6bff"/>
+                <circle class="dot p5 gap-pulse" cx="500" cy="46" r="5.5" fill="#2f6bff"/>
+              </svg>
+              <div class="verdict-row">
+                <span class="vstamp">On track</span>
+                <p><b>Tracking better than predicted.</b> 3 points ahead of the bar we set the day she was hired. Latest read · Day 180.</p>
+              </div>
+              <div class="chart-foot"><b>Day 30 / 60 / 90 / 180 check-ins,</b> scheduled automatically from her start date — each re-checked against the decision basis.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+     </div>
+    </div>
+
+    <!-- ===== IMPACT ===== -->
+    <div class="swt-block" id="b-impact">
+     <div class="swt-fit">
+      <div class="window">
+        <div class="win-bar">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <div class="url">app.withspine.co/impact</div>
+        </div>
+        <div class="ptabs">
+          <span>Decision</span><span>Pipeline</span><span>Calibration</span><span class="on">Impact</span>
+          <span>Integrations</span><span>Future Proofing</span><span>Org Intelligence</span>
+        </div>
+        <div class="pbody" style="padding:0">
+          <div class="bh" style="padding:14px 16px 8px;margin:0">
+            <div class="eyebrow">What Spine earned you</div>
+            <h2>The Spine Gap</h2>
+            <p>The calls Spine got right that your gut would have missed — measured against your own sealed reads.</p>
+          </div>
+          <div class="mcard" style="margin:0 16px 14px;border-radius:10px">
+            <div class="gaphero">
+              <span class="gap-tag">The Spine Gap · 9 decisions scored</span>
+              <div class="gap-head">Spine caught <b>2 calls</b> your gut would have missed — protecting <em>£186,000</em> in hiring cost.</div>
+              <div class="gap-bars">
+                <div class="gap-bcol">
+                  <div class="gap-bar you gb1" style="height:42%"></div>
+                  <div class="gap-blab"><b>3</b><span>Your gut · leaned hire</span></div>
+                </div>
+                <div class="gap-bcol">
+                  <span class="gap-cnt">+2 caught</span>
+                  <div class="gap-bar spn gb2" style="height:70%"></div>
+                  <div class="gap-blab"><b>5</b><span>Spine · backed hire</span></div>
+                </div>
+                <div class="gap-bcol">
+                  <div class="gap-bar win gb3" style="height:62%"></div>
+                  <div class="gap-blab"><b>4</b><span>Worked out · hired &amp; holding</span></div>
+                </div>
+              </div>
+              <div class="gap-value">
+                <div class="vc">
+                  <span class="mcap">Value captured</span>
+                  <b>£186,000</b>
+                  <p>Mis-hire cost and cost-per-hire avoided across the calls Spine got right.</p>
+                </div>
+              </div>
+              <div class="gap-receipts">
+                <span class="mcap rcap">Where the gap showed up</span>
+                <div class="recrow rr1"><span class="avatar" style="width:24px;height:24px;font-size:8.5px">DV</span><div class="rn"><b>Daniel Vance</b><span>Your read: lean pass · Spine: backed hire</span></div><span class="spill green" style="margin-right:8px">Spine right</span><span class="rv">£112k</span></div>
+                <div class="recrow rr2"><span class="avatar" style="width:24px;height:24px;font-size:8.5px">SO</span><div class="rn"><b>Sara Okafor</b><span>Your read: lean hire · Spine: hold</span></div><span class="spill green" style="margin-right:8px">Spine right</span><span class="rv">£74k</span></div>
+                <div class="recrow rr3"><span class="avatar" style="width:24px;height:24px;font-size:8.5px">TM</span><div class="rn"><b>Tom Mercer</b><span>Your read: lean hire · Spine: hire</span></div><span class="spill gray" style="margin-right:8px">Gut held</span><span class="rv" style="color:var(--m-ink3)">—</span></div>
               </div>
             </div>
-            <div class="hire-drawer">
-              <div class="dr"><span class="dlab">What's slipping</span><p>Ship cadence down a third vs Day 60; <b>async participation</b> trailing the bar set at hire.</p></div>
-              <div class="dr"><span class="dlab">What to do</span><p>Handle this week — a scope-and-ownership reset before the Day 180 read.</p></div>
-            </div>
           </div>
-          <div class="tri-grouphead green"><span class="dt"></span>On track <em>— holding at the bar, check-ins on schedule</em></div>
-          <div class="hire-card">
-            <div class="hire-top">
-              <span class="avatar" style="width:28px;height:28px;font-size:9.5px">PA</span>
-              <div class="who"><b>Priya Anand</b><span>Senior Quant Developer · placed 9 Jan · Day 180</span></div>
-              <span class="spill green">On track</span>
-            </div>
-          </div>
-          <div class="tri-foot"><b>The retention read extends calibration</b> out to Day 180 and Day 365.</div>
         </div>
       </div>
+     </div>
     </div>
-  </div>
 
-  <!-- ===== ORG INTELLIGENCE ===== -->
-  <div class="wt-block">
-    <div class="lab"><i></i>Org Intelligence <em>— a living collaboration map with Spine read overlays</em></div>
-    <div class="window">
-      <div class="win-bar">
-        <div class="dots"><i></i><i></i><i></i></div>
-        <div class="url">app.withspine.co/org-intelligence</div>
-      </div>
-      <div class="ptabs">
-        <span>Decision</span><span>Pipeline</span><span>Calibration</span><span>Impact</span>
-        <span>Integrations</span><span>Future Proofing</span><span class="on">Org Intelligence</span>
-      </div>
-      <div class="pbody">
-        <div class="bh">
-          <div class="eyebrow">Org intelligence</div>
-          <h2>A living map of your team</h2>
-          <p>Who's on track, who's a key-person risk, and which interviewers read people best — drafted from Slack.</p>
+    <!-- ===== INTEGRATIONS ===== -->
+    <div class="swt-block" id="b-integrations">
+     <div class="swt-fit">
+      <div class="window">
+        <div class="win-bar">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <div class="url">app.withspine.co/integrations</div>
         </div>
-        <div class="orgmap" style="padding:0">
-          <div class="ghead"><b>Collaboration &amp; signal map</b><span>Drafted from Slack · 8 people</span></div>
-          <div class="graph-wrap">
-            <svg class="graph-svg" viewBox="0 0 560 250" aria-hidden="true">
-              <!-- edges (collaboration) -->
-              <line class="edge e1" x1="280" y1="48"  x2="150" y2="130"/>
-              <line class="edge e2" x1="280" y1="48"  x2="410" y2="130"/>
-              <line class="edge e3" x1="150" y1="130" x2="95"  y2="205"/>
-              <line class="edge e4 hot" x1="150" y1="130" x2="240" y2="205"/>
-              <line class="edge e5" x1="410" y1="130" x2="360" y2="205"/>
-              <line class="edge e6" x1="410" y1="130" x2="470" y2="205"/>
-              <!-- nodes -->
-              <circle class="node n1" cx="280" cy="48"  r="20" fill="#eef3ff" stroke="#2f6bff" stroke-width="2"/>
-              <circle class="node n2" cx="150" cy="130" r="18" fill="#eaf4ee" stroke="#1c8a4d" stroke-width="2"/>
-              <circle class="node n3" cx="410" cy="130" r="18" fill="#eaf4ee" stroke="#1c8a4d" stroke-width="2"/>
-              <circle class="node n4" cx="95"  cy="205" r="16" fill="#fbf2e3" stroke="#b06a00" stroke-width="2"/>
-              <circle class="node n5" cx="240" cy="205" r="16" fill="#fbeceb" stroke="#c8332a" stroke-width="2"/>
-              <circle class="node n6" cx="360" cy="205" r="16" fill="#f5f6f7" stroke="#c9cbd2" stroke-width="2"/>
-              <circle class="node n6" cx="470" cy="205" r="16" fill="#eaf4ee" stroke="#1c8a4d" stroke-width="2"/>
-              <!-- labels -->
-              <text class="nlabel" x="280" y="46" text-anchor="middle">Maya</text>
-              <text class="nrole"  x="280" y="56" text-anchor="middle">Founder</text>
-              <text class="nlabel" x="150" y="128" text-anchor="middle">Philipp</text>
-              <text class="nrole"  x="150" y="138" text-anchor="middle">Eng lead</text>
-              <text class="nlabel" x="410" y="128" text-anchor="middle">Nat</text>
-              <text class="nrole"  x="410" y="138" text-anchor="middle">Product</text>
-              <text class="nlabel" x="95"  y="208" text-anchor="middle">Diego</text>
-              <text class="nlabel" x="240" y="208" text-anchor="middle">Lena</text>
-              <text class="nlabel" x="360" y="208" text-anchor="middle">Sofia</text>
-              <text class="nlabel" x="470" y="208" text-anchor="middle">Sam</text>
-            </svg>
-            <div class="read-overlay risk ro1" style="left:30%;top:62%"><span class="od"></span>Key-person risk</div>
-            <div class="read-overlay ok ro2" style="left:60%;top:38%"><span class="od"></span>Team health · on track</div>
-            <div class="read-overlay fit ro3" style="left:6%;top:30%"><span class="od"></span>Best-fit next hire</div>
+        <div class="ptabs">
+          <span>Decision</span><span>Pipeline</span><span>Calibration</span><span>Impact</span>
+          <span class="on">Integrations</span><span>Future Proofing</span><span>Org Intelligence</span>
+        </div>
+        <div class="pbody">
+          <div class="bh">
+            <div class="eyebrow">Integrations</div>
+            <h2>Connect the channels your candidates come from</h2>
+            <p>Everything you bring in lands in the same pipeline, pre-screened the same way.</p>
           </div>
-          <div class="org-legend">
-            <span><i class="blue"></i> Placed by Spine</span>
-            <span><i class="green"></i> On track</span>
-            <span><i class="amber"></i> Watched · action running</span>
-            <span><i class="gray"></i> Pre-Spine · no read</span>
+          <div class="intg" style="padding:0">
+            <div class="ghead" style="margin-bottom:9px">Pinned · live data sources</div>
+            <div class="connect-grid">
+              <div class="conn-card cs1">
+                <div class="ic">#</div>
+                <div class="ci"><b>Slack</b><span>Live team signals — verify ship cadence &amp; engagement in real time.</span></div>
+                <div class="st">
+                  <span class="spill gray off">Not connected</span>
+                  <span class="spill green on">Connected</span>
+                </div>
+              </div>
+              <div class="conn-card cs2">
+                <div class="ic">@</div>
+                <div class="ci"><b>Gmail</b><span>Scan the candidate inbox so replies &amp; scheduling surface automatically.</span></div>
+                <div class="st">
+                  <span class="spill gray off">Not connected</span>
+                  <span class="spill green on">Connected</span>
+                </div>
+              </div>
+              <div class="conn-card cs3">
+                <div class="ic">G</div>
+                <div class="ci"><b>Greenhouse</b><span>Connect Greenhouse (Harvest API) — pull candidates straight in.</span></div>
+                <div class="st">
+                  <span class="spill amber off">Action needed</span>
+                  <span class="spill green on">Connected</span>
+                </div>
+              </div>
+              <div class="conn-card steady">
+                <div class="ic">↗</div>
+                <div class="ci"><b>Apply link</b><span>Public application URL — candidates self-enter the pipeline.</span></div>
+                <div class="st"><span class="spill blue">Live</span></div>
+              </div>
+            </div>
+            <div class="intg-sum">
+              <div class="srow"><b>3 / 4 connected</b><span>Next: Greenhouse</span></div>
+              <div class="intg-track"><i></i></div>
+            </div>
+            <div class="intg-foot"><b>The key is verified live,</b> then encrypted and stored server-side. It never reaches the browser again.</div>
           </div>
-          <div class="org-foot"><b>Feed pipeline runs through one person</b> — Spine reads collaboration edges for key-person risk, team health and where the next best-fit hire sits.</div>
         </div>
       </div>
+     </div>
     </div>
-  </div>
 
-</div>
+    <!-- ===== FUTURE-PROOFING ===== -->
+    <div class="swt-block" id="b-future">
+     <div class="swt-fit">
+      <div class="window">
+        <div class="win-bar">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <div class="url">app.withspine.co/future-proofing</div>
+        </div>
+        <div class="ptabs">
+          <span>Decision</span><span>Pipeline</span><span>Calibration</span><span>Impact</span>
+          <span>Integrations</span><span class="on">Future Proofing</span><span>Org Intelligence</span>
+        </div>
+        <div class="pbody">
+          <div class="bh">
+            <div class="eyebrow">Future Proofing</div>
+            <h2>The people you placed are still being watched</h2>
+            <p>Spine reads each hire's check-ins and flags the ones drifting toward the door — early enough to keep them.</p>
+          </div>
+          <div class="triage" style="padding:0">
+            <div class="tri-band">
+              <div class="tri-tally"><b>8</b><span>Placed</span></div>
+              <div class="tri-tally"><b class="gr">5</b><span>On track</span></div>
+              <div class="tri-tally"><b class="am">2</b><span>Watch</span></div>
+              <div class="tri-tally"><b class="rd">1</b><span>At risk</span></div>
+            </div>
+            <div class="tri-grouphead amber"><span class="dt"></span>Keep an eye on <em>— doing the job, but one signal is starting to slip</em></div>
+            <div class="hire-card at-risk">
+              <div class="hire-top">
+                <span class="avatar" style="width:28px;height:28px;font-size:9.5px">RK</span>
+                <div class="who"><b>Rohan Khanna</b><span>Backend Engineer · placed 4 Feb · Day 90</span></div>
+                <div class="hire-flip">
+                  <span class="spill amber hf-old">Watch</span>
+                  <span class="spill red hf-new">At risk</span>
+                </div>
+              </div>
+              <div class="hire-drawer">
+                <div class="dr"><span class="dlab">What's slipping</span><p>Ship cadence down a third vs Day 60; <b>async participation</b> trailing the bar set at hire.</p></div>
+                <div class="dr"><span class="dlab">What to do</span><p>Handle this week — a scope-and-ownership reset before the Day 180 read.</p></div>
+              </div>
+            </div>
+            <div class="tri-grouphead green"><span class="dt"></span>On track <em>— holding at the bar, check-ins on schedule</em></div>
+            <div class="hire-card">
+              <div class="hire-top">
+                <span class="avatar" style="width:28px;height:28px;font-size:9.5px">PA</span>
+                <div class="who"><b>Priya Anand</b><span>Senior Quant Developer · placed 9 Jan · Day 180</span></div>
+                <span class="spill green">On track</span>
+              </div>
+            </div>
+            <div class="tri-foot"><b>The retention read extends calibration</b> out to Day 180 and Day 365.</div>
+          </div>
+        </div>
+      </div>
+     </div>
+    </div>
+
+    <!-- ===== ORG INTELLIGENCE ===== -->
+    <div class="swt-block" id="b-org">
+     <div class="swt-fit">
+      <div class="window">
+        <div class="win-bar">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <div class="url">app.withspine.co/org-intelligence</div>
+        </div>
+        <div class="ptabs">
+          <span>Decision</span><span>Pipeline</span><span>Calibration</span><span>Impact</span>
+          <span>Integrations</span><span>Future Proofing</span><span class="on">Org Intelligence</span>
+        </div>
+        <div class="pbody">
+          <div class="bh">
+            <div class="eyebrow">Org intelligence</div>
+            <h2>A living map of your team</h2>
+            <p>Who's on track, who's a key-person risk, and which interviewers read people best — drafted from Slack.</p>
+          </div>
+          <div class="orgmap" style="padding:0">
+            <div class="ghead"><b>Collaboration &amp; signal map</b><span>Drafted from Slack · 8 people</span></div>
+            <div class="graph-wrap">
+              <svg class="graph-svg" viewBox="0 0 560 250" aria-hidden="true">
+                <!-- edges (collaboration) -->
+                <line class="edge e1" x1="280" y1="48"  x2="150" y2="130"/>
+                <line class="edge e2" x1="280" y1="48"  x2="410" y2="130"/>
+                <line class="edge e3" x1="150" y1="130" x2="95"  y2="205"/>
+                <line class="edge e4 hot" x1="150" y1="130" x2="240" y2="205"/>
+                <line class="edge e5" x1="410" y1="130" x2="360" y2="205"/>
+                <line class="edge e6" x1="410" y1="130" x2="470" y2="205"/>
+                <!-- nodes -->
+                <circle class="node n1" cx="280" cy="48"  r="20" fill="#eef3ff" stroke="#2f6bff" stroke-width="2"/>
+                <circle class="node n2" cx="150" cy="130" r="18" fill="#eaf4ee" stroke="#1c8a4d" stroke-width="2"/>
+                <circle class="node n3" cx="410" cy="130" r="18" fill="#eaf4ee" stroke="#1c8a4d" stroke-width="2"/>
+                <circle class="node n4" cx="95"  cy="205" r="16" fill="#fbf2e3" stroke="#b06a00" stroke-width="2"/>
+                <circle class="node n5" cx="240" cy="205" r="16" fill="#fbeceb" stroke="#c8332a" stroke-width="2"/>
+                <circle class="node n6" cx="360" cy="205" r="16" fill="#f5f6f7" stroke="#c9cbd2" stroke-width="2"/>
+                <circle class="node n6" cx="470" cy="205" r="16" fill="#eaf4ee" stroke="#1c8a4d" stroke-width="2"/>
+                <!-- labels -->
+                <text class="nlabel" x="280" y="46" text-anchor="middle">Maya</text>
+                <text class="nrole"  x="280" y="56" text-anchor="middle">Founder</text>
+                <text class="nlabel" x="150" y="128" text-anchor="middle">Philipp</text>
+                <text class="nrole"  x="150" y="138" text-anchor="middle">Eng lead</text>
+                <text class="nlabel" x="410" y="128" text-anchor="middle">Nat</text>
+                <text class="nrole"  x="410" y="138" text-anchor="middle">Product</text>
+                <text class="nlabel" x="95"  y="208" text-anchor="middle">Diego</text>
+                <text class="nlabel" x="240" y="208" text-anchor="middle">Lena</text>
+                <text class="nlabel" x="360" y="208" text-anchor="middle">Sofia</text>
+                <text class="nlabel" x="470" y="208" text-anchor="middle">Sam</text>
+              </svg>
+              <div class="read-overlay risk ro1" style="left:30%;top:62%"><span class="od"></span>Key-person risk</div>
+              <div class="read-overlay ok ro2" style="left:60%;top:38%"><span class="od"></span>Team health · on track</div>
+              <div class="read-overlay fit ro3" style="left:6%;top:30%"><span class="od"></span>Best-fit next hire</div>
+            </div>
+            <div class="org-legend">
+              <span><i class="blue"></i> Placed by Spine</span>
+              <span><i class="green"></i> On track</span>
+              <span><i class="amber"></i> Watched · action running</span>
+              <span><i class="gray"></i> Pre-Spine · no read</span>
+            </div>
+            <div class="org-foot"><b>Feed pipeline runs through one person</b> — Spine reads collaboration edges for key-person risk, team health and where the next best-fit hire sits.</div>
+          </div>
+        </div>
+      </div>
+     </div>
+    </div>
+
+  </div><!-- /.swt-viewport -->
+</div><!-- /.swt -->
+
+<script>
+(function(){
+  var root = document.getElementById('swt');
+  var tabs = Array.prototype.slice.call(root.querySelectorAll('.swt-tab'));
+  var blocks = Array.prototype.slice.call(root.querySelectorAll('.swt-block'));
+  var viewport = root.querySelector('.swt-viewport');
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Scale each panel's inner window down if it's taller than the fixed viewport,
+  // so every walkthrough occupies the same compact clipped footprint.
+  function fitBlock(block){
+    var fit = block.querySelector('.swt-fit');
+    if(!fit) return;
+    fit.style.transform = 'none';
+    var avail = viewport.clientHeight;
+    var natural = fit.scrollHeight;
+    var scale = (natural > avail) ? (avail / natural) : 1;
+    fit.style.transform = scale < 1 ? ('scale(' + scale.toFixed(4) + ')') : 'none';
+  }
+
+  function activate(i){
+    tabs.forEach(function(t,k){
+      var on = k === i;
+      t.classList.toggle('is-active', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    blocks.forEach(function(b,k){ b.classList.toggle('is-active', k === i); });
+    fitBlock(blocks[i]); // measure once visible (display:block) so scrollHeight is real
+    current = i;
+  }
+
+  var current = 0;
+  tabs.forEach(function(t,i){
+    t.addEventListener('click', function(){ activate(i); restart(); });
+  });
+
+  // auto-advance every 6s, pause on hover (skip entirely under reduced motion)
+  var timer = null;
+  function tick(){ activate((current + 1) % tabs.length); }
+  function start(){ if(reduce) return; stop(); timer = setInterval(tick, 6000); }
+  function stop(){ if(timer){ clearInterval(timer); timer = null; } }
+  function restart(){ stop(); start(); }
+  root.addEventListener('mouseenter', stop);
+  root.addEventListener('mouseleave', start);
+
+  // initial layout + refit on resize
+  window.addEventListener('resize', function(){ fitBlock(blocks[current]); });
+  activate(0);
+  start();
+})();
+</script>
+
 </body>
 </html>
