@@ -390,9 +390,44 @@ body{
 .org-foot b{color:var(--m-ink2);font-weight:600}
 
 /* ---------- only the visible panel animates ----------
-   Animations live on .swt-block descendants but are paused while
-   the block is display:none (browsers already pause animations on
-   display:none subtrees); this keeps loops to the active panel. */
+   A non-active block is display:none, which pauses (but does NOT reset)
+   any infinite animations on its subtree — so on re-show they would
+   resume mid-cycle, often on a frame where content is opacity:0/blank.
+   To prevent that we hard-disable animations on every non-active block,
+   AND we leave its animated elements in their fully-revealed resting
+   state (so even with animation:none nothing is invisible). When a block
+   becomes active, JS strips animation:none (the .swt-anim-reset toggle +
+   reflow) so every reveal animation runs fresh from time 0. */
+.swt-block:not(.is-active) *,
+.swt-block:not(.is-active) *::before,
+.swt-block:not(.is-active) *::after,
+.swt-block.swt-anim-reset *,
+.swt-block.swt-anim-reset *::before,
+.swt-block.swt-anim-reset *::after{
+  animation:none!important;transition:none!important;
+}
+/* fully-revealed resting state for every animated element, so the panel
+   is never blank when animations are disabled or before they fire */
+.h-read,.h-rec,.h-f1,.h-f2,.h-f3,
+.verdict-row,
+.gap-cnt,.gap-value .vc b,.recrow,
+.cs1 .on,.cs2 .on,.cs3 .on,
+.hf-new,
+.read-overlay{opacity:1;transform:none}
+.gap-cnt{transform:translateX(-50%)}
+.h-blurnote{opacity:0}
+.dec-rec{opacity:1;transform:none}
+.finrow{opacity:1;transform:none}
+.line-you,.line-spn{stroke-dashoffset:0}
+.cal-svg .dot{opacity:1;transform:none}
+.gap-bar{transform:scaleY(1)}
+.cs1 .off,.cs2 .off,.cs3 .off{opacity:0}
+.intg-track i{width:75%}
+.hf-old{opacity:0}
+.hire-drawer{max-height:90px;opacity:1}
+.graph-svg .edge{stroke-dashoffset:0}
+.graph-svg .node{opacity:1;transform:scale(1)}
+.graph-svg .nlabel,.graph-svg .nrole{opacity:1}
 
 /* ---------- reduced motion: collapse to revealed end-state ---------- */
 @media (prefers-reduced-motion:reduce){
@@ -837,8 +872,18 @@ body{
       t.classList.toggle('is-active', on);
       t.setAttribute('aria-selected', on ? 'true' : 'false');
     });
+    var block = blocks[i];
     blocks.forEach(function(b,k){ b.classList.toggle('is-active', k === i); });
-    fitBlock(blocks[i]); // measure once visible (display:block) so scrollHeight is real
+    fitBlock(block); // measure once visible (display:block) so scrollHeight is real
+    // Restart this panel's reveal animations from time 0: force animation:none
+    // (via .swt-anim-reset), flush a reflow, then release so every keyframe
+    // animation plays its full reveal instead of resuming mid-cycle blank.
+    if(!reduce){
+      block.classList.add('swt-anim-reset');
+      // eslint-disable-next-line no-unused-expressions
+      void block.offsetWidth; // reflow flush
+      block.classList.remove('swt-anim-reset');
+    }
     current = i;
   }
 
