@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spine — Platform launching soon</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .pp-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;gap:22px}
+  .pp-eyebrow{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,#8a8f98)}
+  .pp-h1{font-size:clamp(34px,6vw,60px);line-height:1.05;font-weight:600;max-width:14ch;background:var(--irid,linear-gradient(120deg,#4f7dff,#2fd3c2,#9a6bff));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .pp-h1 em{font-family:"Source Serif 4",Georgia,serif;font-style:italic;font-weight:400}
+  .pp-sub{max-width:46ch;color:var(--muted,#aeb3bb);font-size:17px;line-height:1.6}
+  .pp-note{max-width:48ch;font-size:13px;color:#6b7078;line-height:1.6;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 18px;background:rgba(255,255,255,.02)}
+  .pp-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+  .pp-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:10px;font-size:15px;font-weight:500;text-decoration:none;transition:.18s}
+  .pp-btn.primary{background:var(--irid,linear-gradient(120deg,#4f7dff,#2fd3c2,#9a6bff));color:#fff}
+  .pp-btn.ghost{border:1px solid rgba(255,255,255,.14);color:#e6e8ec}
+  .pp-btn.ghost:hover{border-color:rgba(255,255,255,.3)}
+  .pp-dot{width:7px;height:7px;border-radius:50%;background:#2fd3c2;box-shadow:0 0 12px #2fd3c2;display:inline-block}
+</style>
+</head>
+<body>
+  <div class="pp-wrap">
+    <div class="pp-eyebrow"><span class="pp-dot"></span>&nbsp; app.withspine.co</div>
+    <h1 class="pp-h1">The platform is <em>launching soon</em></h1>
+    <p class="pp-sub">Free sign-up, tool integrations, and decision review are rolling out shortly. The marketing experience you're previewing is live — the product login lands here next.</p>
+    <p class="pp-note">Preview note: this is a staging copy of the Spine V2 site. In production, this button opens <strong>app.withspine.co</strong> — free sign-up via magic link, then onboarding. It's stubbed here so you can review the site without leaving it.</p>
+    <div class="pp-actions">
+      <a class="pp-btn ghost" href="index.html">← Back to site</a>
+      <a class="pp-btn primary" href="pricing.html">See pricing</a>
+    </div>
+  </div>
+</body>
+</html>
