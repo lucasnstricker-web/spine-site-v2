@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How Spine reads a hire</title>
+<style>
+  :root { --ink:#111; --soft:#2a2a2a; --muted:#6b6b6b; --rule:#d9d9d9; --accent:#0f2a44;
+          --accent-soft:#eaf0f5; --tint:#fafafa; }
+  * { box-sizing:border-box; }
+  body { font-family:"Helvetica Neue",Helvetica,Arial,sans-serif; color:var(--ink); background:#fff;
+         margin:0 auto; max-width:720px; padding:48px 28px 72px; line-height:1.55; }
+  .brand { color:var(--accent); font-weight:600; font-size:15px; }
+  h1 { font-size:26px; letter-spacing:-0.015em; margin:8px 0 4px; }
+  .sub { color:var(--muted); font-size:14px; margin:0 0 40px; }
+  section { margin-bottom:44px; animation:fadeUp .5s ease both; }
+  section:nth-of-type(2){animation-delay:.08s} section:nth-of-type(3){animation-delay:.14s}
+  section:nth-of-type(4){animation-delay:.2s}  section:nth-of-type(5){animation-delay:.26s}
+  section:nth-of-type(6){animation-delay:.32s}
+  @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+  h2 { font-size:17px; color:var(--accent); margin:0 0 10px; }
+  p, li { font-size:14.5px; color:var(--soft); }
+  hr { border:none; border-top:1px solid var(--rule); margin:44px 0; }
+
+  /* flow strip */
+  .flow { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:18px 0 8px; }
+  .flow .box { background:var(--accent); color:#fff; border-radius:6px; padding:10px 14px;
+               font-size:13px; font-weight:600; }
+  .flow .box small { display:block; font-weight:400; opacity:.75; font-size:11px; margin-top:2px; }
+  .flow .arr { color:var(--muted); font-size:18px; }
+
+  /* competency list */
+  .comp-list { list-style:none; padding:0; margin:14px 0 0; }
+  .comp-list li { border-bottom:1px solid #eee; padding:12px 0; display:grid;
+                  grid-template-columns:180px 1fr; gap:16px; }
+  .comp-list li:last-child { border-bottom:none; }
+  .comp-name { font-size:14px; font-weight:600; color:var(--accent); }
+  .comp-tag  { font-size:11px; color:var(--muted); margin-top:3px; }
+  .comp-desc { font-size:14px; color:var(--soft); line-height:1.6; }
+
+  /* numbered steps */
+  ol.steps { padding-left:0; list-style:none; counter-reset:s; margin:14px 0 0; }
+  ol.steps li { counter-increment:s; position:relative; padding:10px 0 10px 44px;
+                border-bottom:1px solid #eee; font-size:14.5px; color:var(--soft); }
+  ol.steps li:last-child { border-bottom:none; }
+  ol.steps li::before { content:counter(s); position:absolute; left:0; top:12px; width:26px;
+    height:26px; border-radius:50%; background:var(--accent); color:#fff; font-size:13px;
+    font-weight:700; display:flex; align-items:center; justify-content:center; }
+
+  /* 3-col rhythm grid */
+  .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:14px; }
+  .grid3 div { border:1px solid var(--rule); border-top:3px solid var(--accent); border-radius:6px;
+               padding:14px 14px 12px; font-size:13.5px; color:var(--soft); }
+  .grid3 b { display:block; color:var(--accent); margin-bottom:6px; font-size:13.5px; }
+  .grid3 .mono { font-family:ui-monospace,Menlo,monospace; font-size:18px; color:var(--accent);
+                 font-weight:700; margin-bottom:4px; }
+  .grid3 .label { font-size:12px; color:var(--muted); margin-bottom:8px; }
+
+  /* note box */
+  .note { background:var(--accent-soft); border-radius:6px; padding:12px 16px;
+          font-size:13.5px; color:var(--soft); margin-top:16px; }
+  .note strong { color:var(--accent); }
+
+  /* inline code */
+  code { background:var(--tint); border:1px solid var(--rule); border-radius:4px;
+         padding:1px 6px; font-size:12.5px; font-family:ui-monospace,Menlo,monospace; }
+
+  @media(max-width:560px){
+    .grid3 { grid-template-columns:1fr; }
+    .comp-list li { grid-template-columns:1fr; gap:4px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="brand">Spine</div>
+<h1>How Spine reads a hire</h1>
+<p class="sub">A hiring intelligence platform. We measure five things before an offer and three things after — then compare every prediction to what actually happened.</p>
+
+<section>
+  <h2>The one idea</h2>
+  <p>Most hiring tools help you find more candidates. Spine does something different: it adds structured signal at every stage of the process, seals a prediction before the hire is made, and tracks outcomes at Day 60 and Day 90. The prediction is then compared to reality. That comparison is how the methodology improves over time.</p>
+  <div class="flow">
+    <div class="box">5 competencies<small>pre-hire assessment</small></div>
+    <div class="arr">→</div>
+    <div class="box">Sealed prediction<small>APP probability range</small></div>
+    <div class="arr">→</div>
+    <div class="box">3 post-hire metrics<small>Day 60 &amp; 90</small></div>
+    <div class="arr">→</div>
+    <div class="box">Calibration<small>prediction vs. outcome</small></div>
+  </div>
+</section>
+
+<section>
+  <h2>Before the hire — what we measure</h2>
+  <p>Every candidate is evaluated on five dimensions. Each score requires a cited evidence source — no impressions-only calls. The dimensions are the same whether we're reading a CV or running a full interview series.</p>
+  <ul class="comp-list">
+    <li>
+      <div>
+        <div class="comp-name">Role-specific fit</div>
+        <div class="comp-tag">CV · GitHub</div>
+      </div>
+      <div class="comp-desc">Have they shipped something materially similar — same domain, comparable stack, at comparable scope? Domain-similar shipped work is the primary evidence. Claimed experience without a traceable artefact does not score.</div>
+    </li>
+    <li>
+      <div>
+        <div class="comp-name">Execution speed</div>
+        <div class="comp-tag">CV · GitHub</div>
+      </div>
+      <div class="comp-desc">Dated, delivered outcomes. Production tenure. Solo-built systems with real users. The question is not "what have you worked on" but "what did you ship, when, and at what scale?"</div>
+    </li>
+    <li>
+      <div>
+        <div class="comp-name">Ownership</div>
+        <div class="comp-tag">Interview</div>
+      </div>
+      <div class="comp-desc">Did they drive decisions or follow them? How much of the stated outcome was genuinely theirs? Hard to assess from a CV alone — becomes the primary probe at first interview, and the most predictive post-hire dimension.</div>
+    </li>
+    <li>
+      <div>
+        <div class="comp-name">Resilience</div>
+        <div class="comp-tag">Interview</div>
+      </div>
+      <div class="comp-desc">How does the person perform under pressure, ambiguity, or after a failure? Almost unassessable from a CV. Scored at interview using structured probes and tracked explicitly post-hire — often the dimension that predicts long-term retention over first-90-days output.</div>
+    </li>
+    <li>
+      <div>
+        <div class="comp-name">Proactivity</div>
+        <div class="comp-tag">CV · GitHub</div>
+      </div>
+      <div class="comp-desc">Unsolicited side projects with real users or outcomes. Work done without being asked. One of the most predictive signals in practice — it distinguishes builders from operators at the same skill level.</div>
+    </li>
+  </ul>
+
+  <div class="note">
+    <strong>Output — APP range:</strong> The five dimensions produce a composite that maps to an <strong>A-Player Probability (APP) range</strong> — a low and high bound, not a point estimate. The width reflects what we know and don't know at the time. A CV-only read produces a wider range than a full-interview read. The range narrows as evidence accumulates. A wide band isn't a failure — it's an honest statement about the evidence available at that stage.
+  </div>
+  <div class="note" style="margin-top:8px">
+    <strong>Output — RCI:</strong> Alongside the range, Spine produces a <strong>Risk Concentration Index (RCI)</strong> — a plain-language flag on which specific competency poses the highest risk for this particular hire. The RCI is not a general warning; it identifies the single dimension most likely to cause failure, so it becomes the primary probe at interview. If the RCI points at Ownership, that is what the interview needs to pressure-test. If it points at Execution speed, that is where references should focus.
+  </div>
+</section>
+
+<section>
+  <h2>After the hire — what we track</h2>
+  <p>Most hiring processes measure success at offer acceptance. Spine treats Day 1 as the start of the measurement period. Three metrics are tracked at Day 60 and Day 90.</p>
+  <div class="grid3">
+    <div>
+      <div class="mono">TTFVO</div>
+      <div class="label">Time to First Verifiable Outcome</div>
+      Can the founder point to something that wouldn't exist without this hire? Activity is not an outcome — running meetings doesn't count.
+    </div>
+    <div>
+      <div class="mono">DAV</div>
+      <div class="label">Decision Autonomy Velocity</div>
+      How fast does the hire stop routing decisions to the founder? A senior hire still escalating daily at Day 60 is a strong leading indicator of a failed placement.
+    </div>
+    <div>
+      <div class="mono">EDM</div>
+      <div class="label">Expectation Drift Monitor</div>
+      Did reality match the hiring brief? Drift can mean the hire underperformed, or it can mean the brief was wrong. EDM distinguishes the two.
+    </div>
+  </div>
+  <p style="margin-top:14px">The three metrics feed a single number: the <strong>Prediction-Outcome Delta (POD)</strong> — the gap between the pre-hire prediction and what actually happened at Day 90.</p>
+</section>
+
+<section>
+  <h2>The calibration loop</h2>
+  <p>Every hire Spine touches generates a sealed prediction before the offer and a verified outcome after Day 90. The two are compared — that pairing is the evidence base the methodology is built on.</p>
+  <ol class="steps">
+    <li><strong>Seal the prediction.</strong> Before the hire starts, the five competency scores, the APP range, and the expected post-hire outcomes are recorded and locked — not editable after the hire is made.</li>
+    <li><strong>Track post-hire reality.</strong> At Day 60 and Day 90, TTFVO, DAV, and EDM are measured against what was predicted — not against a market average, but against the specific prediction for this specific hire.</li>
+    <li><strong>Compute the delta.</strong> The gap between prediction and outcome becomes the POD score. A low POD means the methodology read the hire correctly. A high POD surfaces where the model was wrong — and why.</li>
+    <li><strong>Recalibrate.</strong> Each closed pair updates the model. The methodology is not static — it calibrates against the only thing that matters: whether the hire worked.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>What this means in practice</h2>
+  <div class="grid3">
+    <div><b>Gut as a data point</b>Spine captures the founder's instinctive read at every stage and tracks whether it turned out to be right. Over time, each founder learns where their gut is well-calibrated and where it systematically misfires.</div>
+    <div><b>Improves per hire</b>Each closed matched pair makes the read more accurate for the next one. A founder who uses Spine across five hires has a methodology calibrated to their organisation and their outcomes — not generic benchmarks.</div>
+    <div><b>Early warning</b>TTFVO and DAV surface problems at Day 30–60, long before a formal performance review would catch them. Early signal means earlier intervention when it still matters.</div>
+  </div>
+</section>
+
+<hr>
+<p style="font-size:13px; color:var(--muted)">Spine &mdash; <a href="https://withspine.co" style="color:var(--accent)">withspine.co</a></p>
+
+</body>
+</html>
